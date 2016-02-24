@@ -15,6 +15,7 @@ const int colorB = 0;
 
 int potPin = A7;
 int pumpPin = 3;
+int waterLevelPin = 4;
 int potValue;
 int pumpSpeed;
 long unsigned onTime = 0;

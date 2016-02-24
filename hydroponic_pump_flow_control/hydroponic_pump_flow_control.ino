@@ -56,7 +56,7 @@ void loop()
     }
     lcd.print(pumpSpeed);
     analogWrite(pumpPin, pumpSpeed);
-  } else if (pumpOn && (millis() - onTime) > onInterval)
+  } else if ((pumpOn && (millis() - onTime) > onInterval) || isExposedToWater())
   {
     pumpOn = false;
     lcd.setCursor(0, 1);

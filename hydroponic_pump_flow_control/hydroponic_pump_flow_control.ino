@@ -43,7 +43,7 @@ void loop()
   if (pump1on && ((millis() - onTime) < onInterval) )
   {
     lcd.setCursor(0, 1);
-    lcd.print("Pump 1 On ");
+    lcd.print("Pump 1 ON ");
     digitalWrite(pump1Pin, HIGH);
   } else if ((pump1on && (millis() - onTime) > onInterval))
   {
@@ -56,7 +56,7 @@ void loop()
   if (pump2on && ((millis() - onTime) < onInterval) )
   {
     lcd.setCursor(0, 1);
-    lcd.print("Pump 2 On ");
+    lcd.print("Pump 2 ON ");
     digitalWrite(pump2Pin, HIGH);
   } else if ((pump2on && (millis() - onTime) > onInterval))
   {

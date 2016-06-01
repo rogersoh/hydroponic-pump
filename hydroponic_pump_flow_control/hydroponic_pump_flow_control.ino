@@ -13,14 +13,12 @@ const int colorR = 255;
 const int colorG = 121;
 const int colorB = 0;
 
-int potPin = A7;
-int pumpPin = 3;
-int waterLevelPin = 4;
-int potValue;
-int pumpSpeed;
+int pump1Pin = 3;
+int pump2Pin = 4;
 long unsigned onTime = 0;
 long unsigned onInterval = 300000;  //pump on duration 5 minutes (5 * 60 * 1000 ms)
-bool pumpOn = false;
+bool pump1on = false;
+bool pump2on = false;
 
 void setup()
 {
@@ -28,14 +26,13 @@ void setup()
 
   setTime(13, 00, 0, 17, 02, 16); // set time to Saturday 8:29:00am Jan 1 2011
   Alarm.timerRepeat(900, Repeats);            // timer for every 15 minutes
-  Alarm.timerOnce(5, OnceOnly);             // called once after 10 seconds
+  Alarm.timerOnce(5, OnceOnly);             // called once after 5 seconds
 
-  pinMode(pumpPin, OUTPUT);
+  pinMode(pump1Pin, OUTPUT);
+  pinMode(pump2Pin, OUTPUT);
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   lcd.setRGB(colorR, colorG, colorB);
-
-  pinMode(waterLevelPin, INPUT);
 }
 
 void loop()
@@ -43,25 +40,28 @@ void loop()
   lcd.clear();
   digitalClockDisplay();
 
-  if (pumpOn && ((millis() - onTime) < onInterval) && !isExposedToWater())
+  if (pump1on && ((millis() - onTime) < onInterval) )
   {
     lcd.setCursor(0, 1);
-    lcd.print("Pump On ");
-    // print the number of seconds since reset:
-    potValue = analogRead(potPin);
-    potValue = map(potValue, 0, 1024, 44, 200);
-    if (potValue >= 44 && potValue <= 200)
-    {
-      pumpSpeed = potValue;
-    }
-    lcd.print(pumpSpeed);
-    analogWrite(pumpPin, pumpSpeed);
-  } else if ((pumpOn && (millis() - onTime) > onInterval) || isExposedToWater())
+    lcd.print("Pump 1 On ");
+    digitalWrite(pump1Pin, HIGH);
+  } else if ((pump1on && (millis() - onTime) > onInterval))
   {
-    pumpOn = false;
+    pump1on = false;
+    pump2on = true;
+    digitalWrite(pump1Pin, LOW);
+    onTime = millis();
+  }
+
+  if (pump2on && ((millis() - onTime) < onInterval) )
+  {
     lcd.setCursor(0, 1);
-    lcd.print("Pump Off");
-    analogWrite(pumpPin, 0);
+    lcd.print("Pump 2 On ");
+    digitalWrite(pump2Pin, HIGH);
+  } else if ((pump2on && (millis() - onTime) > onInterval))
+  {
+    pump2on = false;
+    digitalWrite(pump2Pin, LOW);
   }
 
   Alarm.delay(1000);
@@ -70,13 +70,13 @@ void loop()
 // functions to be called when an alarm triggers:
 
 void Repeats() {
-  pumpOn = true;
+  pump1on = true;
   onTime = millis();
 }
 
 void OnceOnly() {
   Serial.println("This timer only triggers once");
-  pumpOn = true;
+  pump1on = true;
   onTime = millis();
 }
 
@@ -106,13 +106,5 @@ void printDigits(int digits)
   lcd.print(digits);
 }
 
-/*Function: Determine whether the sensor is exposed to the water    */
-/*Parameter:-void                                 */
-/*Return: -boolean,if it is exposed to the water,it will return true. */
-boolean isExposedToWater()
-{
-  if(digitalRead(waterLevelPin) == LOW)
-    return true;
-  else return false;
-}
+
 
